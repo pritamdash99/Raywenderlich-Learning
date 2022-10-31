@@ -1,2 +1,2 @@
 # Raywenderlich-Learning
-For indepth iOS Concepts.
+For studying indepth iOS Concepts.
