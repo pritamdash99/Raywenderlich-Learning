@@ -1,0 +1,1354 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fnil\fcharset0 Menlo-Bold;
+\f3\fnil\fcharset0 Menlo-Regular;\f4\fnil\fcharset0 AppleColorEmoji;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red255\green255\blue255;
+\red129\green0\blue2;\red255\green255\blue255;\red252\green95\blue163;\red31\green31\blue36;\red255\green255\blue255;
+\red93\green216\blue255;\red208\green168\blue255;\red108\green121\blue134;\red65\green161\blue192;\red158\green241\blue221;
+\red103\green183\blue164;\red158\green241\blue221;\red103\green183\blue164;\red161\green103\blue230;\red208\green168\blue255;
+\red161\green103\blue230;\red84\green130\blue255;\red252\green106\blue93;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c99985\c0;\cssrgb\c100000\c100000\c99971\c0;
+\cssrgb\c58580\c2312\c0;\cssrgb\c100000\c100000\c99970\c0;\csgenericrgb\c98839\c37355\c63833;\csgenericrgb\c12054\c12284\c14131;\csgenericrgb\c100000\c100000\c100000\c85000;
+\csgenericrgb\c36295\c84643\c99897;\csgenericrgb\c81681\c65692\c99927;\csgenericrgb\c42394\c47462\c52518;\csgenericrgb\c25490\c63137\c75294;\csgenericrgb\c61961\c94510\c86667;
+\csgenericrgb\c40392\c71765\c64314;\csgenericrgb\c62145\c94386\c86819;\csgenericrgb\c40538\c71705\c64209;\csgenericrgb\c63137\c40392\c90196;\csgenericrgb\c81569\c65882\c100000;
+\csgenericrgb\c63232\c40219\c90115;\csgenericrgb\c33019\c51127\c99859;\csgenericrgb\c98912\c41558\c36568;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww28600\viewh14380\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f1\b\fs48 \cf0 \ul \ulc0 SAVING DATA IN IOS : 
+\f0\b0\fs24 \ulnone \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+Due to sandboxing restrictions in iOS only a handful of libraries are available to store and manage file in iOS. The users document directory is a common and appropriate place to store a data.\
+iOS apps are isolated form one another and the way this is achieved is each app has it\'92s own sandbox ( a place to store and access files exclusively within your app).\
+In swift, directories are accessed using the URL struct, we will be using the file manager to get the document directory URL \
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f1\b\fs36 \cf0 PART 1 : FILES AND DATA \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f0\b0\fs24 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf0 \ul DOCUMENT DIRECTORY 
+\f0\b0\fs24 \ulnone \
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b\fs20 \cf2 \cb3 import
+\f3\b0  \cb4 Foundation\cb3 \
+\
+\cb4 /*\
+ 1st\
+ //Everything We need is in Foundation Framework for now.\
+ //Access the Default File Manager\
+ // The default FileManager methods are thread safe.\
+ //One way to find the directory is to use the FileManager's instance method named as "URLs"\
+ // <#T##FileManager.SearchPathDirectory#> is the first argument and it dictates which directory you want? example = document directory / desktop directory .. etc\
+ // <#T##FileManager.SearchPathDomainMask#> is the 2nd argument and it asks the user domain mask and that's how you tell the FileManager that the directory belongs to the user.\
+ //.urls method returns an array of urls but there's only 1 document directory per iOS app, and if you want that single url then subscripting the array;s only valid index , i.e 0 will grab it for you\
+ \
+ FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]\
+ then\
+ \
+ //.urls method is very lengthy so makes it difficult to access the document directory, as there is so much use for it, we gotta refactor the code to make it easier so let's add a computed property documentDirectoryURL\
+ \
+ var documentDirectoryURL : URL \{\
+ FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]\
+ \}\
+ then\
+ \
+ //If you want to use this shortcut across apps its better to add inside the extension of FileManager\
+ \
+ extension FileManager\{\
+     var documentDirectoryURL : URL \{\
+     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]\
+     \}\
+ \}\
+ then\
+ \
+ //Since we don't need a specific instance of file manager to access this, we can make it static\
+ \
+ extension FileManager\{\
+     static var documentDirectoryURL : URL \{\
+     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]\
+     \}\
+ \}\
+ then\
+ \
+ //Because default is also a property of the file manager you dont need to use FileManager in the computed Property anymore.\
+ //But by removing FileManager you need to add back case(``) as default is a swift keyword\
+\
+ \
+ extension FileManager\{\
+     static var documentDirectoryURL : URL \{\
+     `default`.urls(for: .documentDirectory, in: .userDomainMask)[0]\
+     \}\
+ \}\
+ then\
+ \
+ the above code got shifted to the file FileManager.swift\
+ then\
+ \
+ FileManager.documentDirectoryURL throws error 'documentDirectoryURL' is inaccessible due to 'internal' protection level\
+ so we need to make the extension public.\
+then\
+ \
+ //As you work with file manager and directories you need to see the contents of your directories and data. An easy way to access the document directory is to right click or option click to the file that is shown at the right side of your playground\
+ \
+ right click on the url shown at the right side of the playground\
+ "file:///Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/1A3353EB-30C3-4214-9767-12695F375C1D/Documents/"\
+ then select "Open url"\
+ and then the playground's document directory opens\
+ */\
+\
+\
+//Now you can access the newly created property as so :\
+FileManager.documentDirectoryURL\
+\
+\
+//A good place for reusable code in playground is the sources folder.\
+//Once sources is selected you can type (option + command + n) to make a new folder\cb3 .\
+//Then when the new folder is selected type (command + n) to make a new file.\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 \
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f3\fs20 \cf2 \cb4 FileManager.swift\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b \cf2 import
+\f3\b0  Foundation\
+\
+
+\f2\b public
+\f3\b0  
+\f2\b extension
+\f3\b0  FileManager\{\
+    
+\f2\b static
+\f3\b0  
+\f2\b var
+\f3\b0  documentDirectoryURL : URL \{\
+    `default`.urls(for: .documentDirectory, in: .userDomainMask)[0]\
+    \}\
+\}\cf5 \cb3 \
+
+\f0\fs24 \cf0 \cb1 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf0 \ul PATHS 
+\f0\b0\fs24 \ulnone \
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b\fs20 \cf2 \cb3 import
+\f3\b0  Foundation\
+//The string components of a url are collectively known as it's path. By acting as a wrap around a string a URL makes it really easy to manipulate that string for what you need.\
+//If you want to see a URLs path you can use it's path property\
+//A urls path is a string which is much more informative in a playground.\
+\
+//FileManager.documentDirectoryUrl.path // shows a long string on the righ side panel\
+\
+//Document Directory path is always going to be long and hard to read. It's also going to be different for every playground and for every iOS app. So you don't memorize it just ask the file manager for the right path.\
+\
+FileManager.documentDirectoryUrl\
+/*\
+ O/p :\
+ file:///Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/DA7B7840-68CD-4712-BD17-75667BBDBFC4/Documents/\
+ */\
+// right clicking on the url will open the finder and show that the document directory of this playground is empty.\
+//So now lets create a file URL and see\
+\
+//add a constant url path called Reminders Data URL and initialse it with the arguments label "fileURLWithPath" and "relativeTo"\
+//fileURLWithPath is the name of the new path\
+// relativeTo - can be said as the file will be put inside the "relativeTo" folder.\
+
+\f2\b let
+\f3\b0  remindersDataURL = URL(fileURLWithPath: "Reminders", relativeTo: FileManager.documentDirectoryUrl)\
+/*\
+ O/p :\
+    Reminders -- file:///Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/DA7B7840-68CD-4712-BD17-75667BBDBFC4/Documents/\
+ */\
+\
+//Along with the reminders data we will also be going to save a string, will be doing that at stringURL and this time you will construct it not with a url initialiser but a couple of instance methods that return a modified URLs\
+// appendingPathComponent allows you add a fileName to a directory\
+\
+
+\f2\b let
+\f3\b0  stringURL = FileManager.documentDirectoryUrl.appendingPathComponent("String").appendingPathExtension("txt")\
+//This method is also available if you want to do add a new file to the document directory\
+/*\
+ O/p :\
+ file:///Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/DA7B7840-68CD-4712-BD17-75667BBDBFC4/Documents/String.txt\
+*/\
+\
+stringURL.path\
+//this path contains a "/String.txt" at the end as expected.\
+\
+/*\
+CHALLENGE :\
+Make your own string and a url to save it to. Store the string in the challengeString constant\
+Use the challengeStringURL to store the url\
+Add the .txt file extension\
+*/\
+\
+\
+
+\f2\b let
+\f3\b0  challengeString : String = "Hello World"\
+
+\f2\b let
+\f3\b0  challengeStringUrl = URL(fileURLWithPath: challengeString, relativeTo: FileManager.documentDirectoryUrl).appendingPathExtension("txt")\
+print(challengeStringUrl)\
+/*\
+ O/p :\
+ Hello%20World.txt -- file:///Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/DA7B7840-68CD-4712-BD17-75667BBDBFC4/Documents/\
+ */\
+\
+print(challengeStringUrl.path)\
+/*\
+ O/p  :\
+ /Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/DA7B7840-68CD-4712-BD17-75667BBDBFC4/Documents/Hello World.txt\
+ */\
+\
+//A handy property to get the file name and extension from a URL as long as ot represents a file : lastPathComponent\
+print(challengeStringUrl.lastPathComponent)\
+// O/p : Hello World.txt\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \cb1 \
+\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf0 \ul DATA  AND DATA TYPES
+\fs24 \ulnone \
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f3\b0\fs20 \cf2 \cb3 /*\
+ Name Data can be a bit overloaded but in Swift you use "Foundation.Data"\
+ struct Data \{ \}\
+ A byte array with super powers\
+ \
+ Smallest Unit od data = 1 byte (i.e 8 bits)\
+ BIT = Binary digIT\
+ \
+ Integers = whole numbers(signed and unsigned) i.e (+ve and -ve , +ve only)\
+ UInt8 structure in swift is also used to reperesnt a byte or 8 bits\
+ With 8 bits the range of value you get per byte is 2^8\
+ (0 -> 255)\
+ \
+ Floats = decimals(Single precision floating point values)\
+ As with Integers they do have a limit on both the positive and negative end and unlike Int you donot have multiple variants of float.\
+ \
+ \
+ Double = decimals with more precission\
+ These allow you to store much larger and smaller values with much more precission.\
+ Double is not exactly twice the size of the floats, it's just derives from the fact that a double precision number uses twixe the bits than a regular single precesion number\
+ \
+ \
+ String = stores Text\
+ \
+ Boolean = true / false\
+ \
+ */\
+\
+
+\f2\b let
+\f3\b0  age : UInt8 = 32\
+\
+//How can you tell how much of bytes a data type uses and what are it's max and min values ?\
+//Use MaymoryLayout enum inorder to find out the amount of bytes a data type uses on your specific hardware or device, it's size method lets you pass in a variable or a constant to get this.\
+MemoryLayout.size(ofValue: age) // O/p = 1\
+MemoryLayout<UInt8>.size // O/p = 1\
+//UInt has handy variables that let you store min and max values in them\
+UInt8.max // O/p = 255\
+UInt8.min // O/p = 0\
+\
+//Case will be different when it becomes a signed integer\
+
+\f2\b let
+\f3\b0  height : Int8 = 72\
+MemoryLayout.size(ofValue: height) // O/p = 1\
+MemoryLayout<Int8>.size // O/p = 1\
+//Int has handy variables that let you store min and max values in them\
+Int8.max // O/p = 127\
+Int8.min // O/p = -128\
+//Still 256 values but range changes and includes +ve and -ve values\
+\
+//With Int8 you also have with you Int, Int16, Int32, Int64\
+//With UInt8 you also have with you UInt, UInt16, UInt32, UInt64\
+//On 64 bits systems , the amount of bytes Int and Int64 use is the same, it's 8 bytes / 64 bits\
+\
+
+\f2\b let
+\f3\b0  weight : Float = 154.8\
+MemoryLayout.size(ofValue: weight) // O/p = 4\
+//The amount of bytes a float uses = 4\
+//You can see the approx min and max value it can hold\
+Float.leastNormalMagnitude // O/p = 1.175494e-38\
+Float.greatestFiniteMagnitude // O/p = 3.402823e+38\
+//Its mentioned approx because the bigger or smaller a float number becomes the more precision you lose.\
+//The precision depends on what underlying format is used to represent the floating point value.\
+//Most computer use IEEE floating point format\
+\
+
+\f2\b let
+\f3\b0  earthRadius : Double = 3958.8\
+MemoryLayout.size(ofValue: earthRadius) // O/p = 8\
+Double.leastNormalMagnitude// O/p = 2.225073858507201e-308\
+Double.greatestFiniteMagnitude // O/p = 1.797693134862316e+308\
+\
+\
+//MARK : BINARY AND HEXADECIMAL\
+// By default when you use an integer literal in Swift it is in Base 10, a decimal number so you can directly use 0 -> 255. But you can prefix your integer to change your base.\
+/*\
+ prefix =  0b ( base 2 literal)\
+ b is for binary which only uses 0 and 1 for digits\
+ with decimal it is easier to read every 3 digits but for binary it is better if it is seperated by _ every 4 digits\
+ A group of 4 bits is known as a nibble and often represented using a base16\
+ also known as hexadecimal or just hex digit.\
+ Every nibble in decimal is a value from 0 -> 15. inclusive.\
+ Past number 9 we use the 1st 6 letters of alpabets for hex literals\
+ prefix = 0x (hexadecimal iteral)\
+ */\
+\
+
+\f2\b let
+\f3\b0  ageBinaryUnsigned : UInt8 = 0b0010_0000 // O/p = 32\
+
+\f2\b let
+\f3\b0  ageBinarySigned : Int8 = -0b0010_0000 // O/p = -32\
+
+\f2\b let
+\f3\b0  weightHexaDecimalUnsigned : UInt16 = 0x9B // O/p = 155\
+
+\f2\b let
+\f3\b0  weightHexaDecimalSigned : Int16 = -0x9B // O/p = -155\
+\
+//They use the same respective sizes just the number representation changed.\
+\
+
+\f2\b let
+\f3\b0  favouriteBytes : [UInt8] = [\
+    240,            159,            152,            184,\
+    0b1111_0000,    0b1001_1111,    0b1001_1000,    186,\
+    0xF0,           0x9F,           0x98,           187\
+]\
+//O/p : [240, 159, 152, 184, 240, 159, 152, 186, 240, 159, 152, 187]\
+\
+MemoryLayout<UInt8>.size * favouriteBytes.count // O/p = 12\
+//So 12 elements each using 1 byte of memory.\
+\
+\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf2 \ul SAVING AND LOADING OF DATA 
+\f0\b0\fs24 \ulnone \
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b\fs20 \cf2 import
+\f3\b0  Foundation\
+
+\f2\b let
+\f3\b0  favouriteBytes : [UInt8] = [\
+    240,            159,            152,            184,\
+    0b1111_0000,    0b1001_1111,    0b1001_1000,    186,\
+    0xF0,           0x9F,           0x98,           187\
+]\
+\
+//Saving the data to documents directory of this playground\
+//Create an instance of Data\
+\
+
+\f2\b var
+\f3\b0  favouriteBytesData = Data(favouriteBytes)\
+//we need to know where this Data gets stored, so create a URL\
+\
+
+\f2\b var
+\f3\b0  favouritesByteURL = URL(fileURLWithPath:"Favourite Bytes", relativeTo: FileManager.documentDirectoryUrl)\
+\
+//Data had a "writes" method that takes a url\
+\
+\
+//favouriteBytesData.write(to : favouritesByteURL) here the .write() will throw an error if it doesnot succeed. So you need a try before hand\
+
+\f2\b try
+\f3\b0  favouriteBytesData.write(to : favouritesByteURL)\
+//this adds a file inside the document directory with the name "Favourite Bytes"\
+\
+//Now inorder to read the contents of that url Data has an initializer for that.\
+//You will store the data as " Saved favourite bytes data"\
+\
+//Data(contentsOf: favouritesByteURL) will throw an error if there is no content to read from that url so we need to add try.\
+//And also the error could happen if the url represnts a directory instead of a file.\
+\
+
+\f2\b let
+\f3\b0  savedFavouriteBytesData = 
+\f2\b try
+\f3\b0  Data(contentsOf: favouritesByteURL) //Output = 12 bytes\
+//similar to the previous chapters MemoryLayout.size() for favouriteBytes\
+\
+//To get your numbers back , you can use an array initialiser which accepts a data instance.\
+
+\f2\b let
+\f3\b0  savedFavouriteBytes = Array(savedFavouriteBytesData)\
+//o/p = [240, 159, 152, 184, 240, 159, 152, 186, 240, 159, 152, 187]\
+\
+//let swift verify that the saved favourite bytes is equal to the original favorite bytes declared above\
+\
+savedFavouriteBytes == favouriteBytes // o/p = true\
+\
+//you can treat data as an array of bytes so you can equate them directly\
+favouriteBytesData == savedFavouriteBytesData // o/p = true\
+\
+\
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b\fs36 \cf2 \ul STRING
+\f3\b0\fs20 \ulnone \
+\
+\
+//what exactly is stored in the favouriteBytes ? time to write their data agin but this time with a file extension\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b \cf2 try
+\f3\b0  favouriteBytesData.write(to: favouritesByteURL.appendingPathExtension("txt"))\
+\
+//click on the favouriteBytesUrl to open in finder to see that the Favorite bytes.txt file can open but contains 3 cat emojis, using 12 bytes of data\
+//the txt file extension lets the finder know that the file you wrote just represents a string , the same data without an extension will not open in finder because finder doesnot know what to show to you.\
+\
+//lets read back the saved cats in swift\
+// you can tell swift that you are working with a string, by using a string initialiser and a string encoding\
+\
+
+\f2\b let
+\f3\b0  string = String(data : savedFavouriteBytesData, encoding : .utf8)!\
+\
+// O/p : "
+\f4 \uc0\u55357 \u56888 \u55357 \u56890 \u55357 \u56891 
+\f3 "\
+// The mystery bytes represnt the happy cat string using the utf8 encoding\
+//Also the String() initialiser is failable, but as we know it will work, we can force unwrap it.\
+\
+//Now the favourite data makes sense, each one of the 3 rows, makes 1 cat face, so every cat face requires 4 bytes of data. So as the total bytes consumed are 12, there are 3 cat faces.\
+//But how did the playground know that these 4 particular elements combined will result in cat face ? That's where the unicode standard comes to play.\
+//Unicode = Universal Coded Character Set is a standard that specifies the representation of texts.\
+//utf = Unicode Transformation Format is a set of standards for encoding a unicode character set into bits of data.\
+//utf8 = Unicode Transformation Format 8 bit is one of the encodings available. It is a variable in encoding that can be used to represent all characters in the unicode character set.\
+//utf8 can use 1 -> 4  8bit bytes or 1 -> 4 Octates.\
+//There are other utfs to use like utf16 and utf32\
+/*\
+ utf8 is more reliable as\
+ 1. it's backward compatible with ascii character set and\
+ 2. it uses fewer bytes of data when storing things in memory or to a file\
+ 3. you don't need to specify the byte order when using utf8\
+\
+ */\
+\
+\
+//What happens when you save a string with it's write method ?\
+\
+//make a url to write the string file into\
+\
+
+\f2\b var
+\f3\b0  catsURL = URL(fileURLWithPath: "Cats.txt", relativeTo: FileManager.documentDirectoryUrl)\
+\
+/*O/p :\
+ Cats.txt -- file:///Users/pritamdash/Library/Developer/XCPGDevices/FD034AD8-FA09-4BAB-9A5F-CDA144EBCA5E/data/Containers/Data/Application/15F56A01-4F77-4740-9908-6012D11AD82B/Documents/\
+*/\
+//atomically allows you to write to a url while avoiding potential file correuption\
+\
+
+\f2\b try
+\f3\b0  string.write(to: catsURL, atomically: 
+\f2\b true
+\f3\b0 , encoding: .utf8)\
+\
+// output : you get to see the cats.txt file in the doument directory of the playground and you see the cat emojies saved in it.\
+// Now to read this :\
+\
+
+\f2\b let
+\f3\b0  catsChallengeString = 
+\f2\b try
+\f3\b0  String(contentsOf : catsURL)\
+//O/p : "
+\f4 \uc0\u55357 \u56888 \u55357 \u56890 \u55357 \u56891 
+\f3 "\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f1\b\fs36 \cf0 \cb1 PART 2 : JSON\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f0\b0\fs24 \cf2 \cb3 \
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b\fs36 \cf2 \ul \ulc2 JSON DECODING\
+\
+
+\f3\b0\fs24 \cb6 \ulnone \
+
+\f0 \cb3 Json is now a very popular format to transfer data over the web, working json supplied by a web service is a frequent task in web development.\
+Additionally json is also a viable solution for data saving in iOS.\
+Json : JavaScript Object Notation \
+JavaScript objects are like : [String : Any] \
+Swift heterogeneous dictionaries are similar to Json but json elements are wrapped in curly braces.\
+\
+Json Data Types :\
+\pard\tx220\tx720\pardeftab494\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf2 {\listtext	\uc0\u8226 	}Bool \
+{\listtext	\uc0\u8226 	}Integers & Floating Point Numbers \
+{\listtext	\uc0\u8226 	}String\
+{\listtext	\uc0\u8226 	}Array \
+{\listtext	\uc0\u8226 	}Dictionary <String, Any>\
+{\listtext	\uc0\u8226 	}Data : Encoded using string\
+{\listtext	\uc0\u8226 	}Date : Proper formatted String\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+\cf2 \
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f2\b\fs20 \cf2 private
+\f3\b0  
+\f2\b func
+\f3\b0  loadJson() \{\
+        //get the urls for each json file , for that we use bundles url for resource with extension method\
+        //Bundle is a representation of the app, it's code and resources,all the files that you pack under xcode project are collectively a part of bundle\
+        //main represents the current executable in this case your app.\
+        \
+        
+\f2\b guard
+\f3\b0  
+\f2\b let
+\f3\b0  taskJsonUrl = Bundle.main.url(forResource: "Task", withExtension: "json"),\
+              
+\f2\b let
+\f3\b0  prioritizedTaskJsonUrl = Bundle.main.url(forResource: "PrioritizedTask", withExtension: "json")\
+        
+\f2\b else
+\f3\b0 \{ 
+\f2\b return
+\f3\b0  \}\
+        \
+        //after fetching the urls, you decode these json using jsonDecoder object(helps to decode json into instances of given data types, here the types are Task and PrioritizedTask.\
+        
+\f2\b let
+\f3\b0  decoder = JSONDecoder()\
+        \
+        //load the contents of the json files as swift data and then decode these data into your types.\
+        //Data(contentsOf: taskJsonUrl) can throw an error so we wrap it in do try catch block\
+        \
+        
+\f2\b do
+\f3\b0  \{\
+            
+\f2\b let
+\f3\b0  taskData = 
+\f2\b try
+\f3\b0  Data(contentsOf: taskJsonUrl)\
+            
+\f2\b let
+\f3\b0  prioritizedTaskData = 
+\f2\b try
+\f3\b0  Data(contentsOf: prioritizedTaskJsonUrl)\
+            //now we have 2 data object that we need to decode from json to swift data\
+            \
+            //decoder.decode(Task.self, from: taskData) also can throw an error so wrap it in try and Task needs to confirm the Codable Protocol\
+            
+\f2\b let
+\f3\b0  task = 
+\f2\b try
+\f3\b0  decoder.decode(Task.
+\f2\b self
+\f3\b0 , from: taskData)\
+            //print(task)\
+            /*\
+             O/p as the app launches\
+             Task(id: EBC20985-9D8F-4F63-89A7-571E4DB977C2, name: "Code a SwiftUI app", completed: false) similar to the task.json just the id gets generated different for every task\
+             */\
+            \
+            //PrioritizedTasks and Priority need to confirm the codable\
+            
+\f2\b let
+\f3\b0  priorityTask = 
+\f2\b try
+\f3\b0  decoder.decode(TaskStore.PrioritizedTasks.
+\f2\b self
+\f3\b0 , from: prioritizedTaskData)\
+           // print(priorityTask)\
+            /*\
+             O/p : PrioritizedTasks(priority: TaskList.Task.Priority.high, tasks: [TaskList.Task(id: A6B35BB8-9DCF-4D93-AA3A-E124AAFC101F, name: "Code a SwiftUI app", completed: false), TaskList.Task(id: 1CA4AB6C-C53F-479E-9383-9CE773B27679, name: "Book an escape room", completed: false), TaskList.Task(id: 3BE83FBE-B2D0-4883-B3B4-3B2D1B0D7819, name: "Walk the cat", completed: false), TaskList.Task(id: 97B06DB5-A9E4-4670-897B-39A86810E7A2, name: "Pick up heavy things and put them down", completed: false)])\
+             */\
+            \
+            //If your type is encodable then not only can you decode an instance but also store an array of its instances in a json\
+           // Now we make changes task.json -> tasks.json and prioritizedtask.json -> prioritizedtasks.json and the necessary var changes, save this func to notes.\
+            \
+        \}\
+        
+\f2\b catch
+\f3\b0  
+\f2\b let
+\f3\b0  error\{\
+            print(error)\
+        \}\
+        \
+        \
+    \}
+\f0\fs24 \
+\
+This becomes :\
+\
+
+\f2\b\fs20 private
+\f3\b0  
+\f2\b func
+\f3\b0  loadJson() \{\
+        //get the urls for each json file , for that we use bundles url for resource with extension method\
+        //Bundle is a representation of the app, it's code and resources,all the files that you pack under xcode project are collectively a part of bundle\
+        //main represents the current executable in this case your app.\
+        \
+        
+\f2\b guard
+\f3\b0  
+\f2\b let
+\f3\b0  tasksJsonUrl = Bundle.main.url(forResource: "Tasks", withExtension: "json"),\
+              
+\f2\b let
+\f3\b0  prioritizedTasksJsonUrl = Bundle.main.url(forResource: "PrioritizedTasks", withExtension: "json")\
+        
+\f2\b else
+\f3\b0 \{ 
+\f2\b return
+\f3\b0  \}\
+        \
+        //after fetching the urls, you decode these json using jsonDecoder object(helps to decode json into instances of given data types, here the types are Task and PrioritizedTask.\
+        
+\f2\b let
+\f3\b0  decoder = JSONDecoder()\
+        \
+        //load the contents of the json files as swift data and then decode these data into your types.\
+        //Data(contentsOf: taskJsonUrl) can throw an error so we wrap it in do try catch block\
+        \
+        
+\f2\b do
+\f3\b0  \{\
+            
+\f2\b let
+\f3\b0  tasksData = 
+\f2\b try
+\f3\b0  Data(contentsOf: tasksJsonUrl)\
+            
+\f2\b let
+\f3\b0  prioritizedTasksData = 
+\f2\b try
+\f3\b0  Data(contentsOf: prioritizedTasksJsonUrl)\
+            //now we have 2 data object that we need to decode from json to swift data\
+            \
+            //decoder.decode(Task.self, from: taskData) also can throw an error so wrap it in try and Task needs to confirm the Codable Protocol\
+            
+\f2\b let
+\f3\b0  tasks = 
+\f2\b try
+\f3\b0  decoder.decode([Task].
+\f2\b self
+\f3\b0 , from: tasksData)\
+            print(tasks)\
+            /*\
+             O/p as the app launches\
+             [TaskList.Task(id: 27AD9FFF-5C34-48CA-84DA-7C915B0C0578, name: "Code a SwiftUI app", completed: false), TaskList.Task(id: D64E3E4E-18CF-4813-9E92-2B34FA8EE051, name: "Book an escape room", completed: false), TaskList.Task(id: 495E1DB6-B4E0-438F-87A6-CFD92C5E7797, name: "Walk the cat", completed: false), TaskList.Task(id: FFAB4C6F-91A9-408E-A4E2-C6ECE5195F2F, name: "Pick up heavy things and put them down", completed: true)]\
+             */\
+            \
+            //PrioritizedTasks and Priority need to confirm the codable\
+            
+\f2\b let
+\f3\b0  priorityTasks = 
+\f2\b try
+\f3\b0  decoder.decode([TaskStore.PrioritizedTasks].
+\f2\b self
+\f3\b0 , from: prioritizedTasksData)\
+            print(priorityTasks)\
+            /*\
+        \
+             [TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.high, tasks: [TaskList.Task(id: 51F09ED2-1C1C-4528-B369-182F52987BEC, name: "Code a SwiftUI app", completed: false), TaskList.Task(id: 2F48DF35-6BD0-4A4B-95AC-29A5F9798FFD, name: "Book an escape room", completed: false), TaskList.Task(id: 831AB02D-6240-4DDC-9E3A-B9B360163E6D, name: "Walk the cat", completed: false), TaskList.Task(id: 18E880A0-42D5-4195-A2C4-F64A16B2F113, name: "Pick up heavy things and put them down", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.medium, tasks: [TaskList.Task(id: A7507FE8-8EDE-4F83-BF71-B6F36CCAFFCE, name: "Make karaoke playlist", completed: false), TaskList.Task(id: 98AF9CC8-A45E-4E3D-A55F-060AEA00F3CF, name: "Present at iOS meetup group", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.low, tasks: [TaskList.Task(id: 300CAEE9-4057-421A-9C1C-15E550878C9B, name: "Climb El Capitan", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.no, tasks: [TaskList.Task(id: 75E7083A-1565-4629-B2FE-2C02C48E43D7, name: "Learn to make baklava", completed: false), TaskList.Task(id: 67E15475-F6C5-4D44-8F08-4EF3F8DF1DE5, name: "Play disc golf in every state", completed: true), TaskList.Task(id: 78AA6C07-634F-4670-925E-786AFD657AA2, name: "100 movie reboot marathon", completed: false)])]\
+             */\
+            \
+            //If your type is encodable then not only can you decode an instance but also store an array of its instances in a json\
+           // Now we make changes task.json -> tasks.json and prioritizedtask.json -> prioritizedtasks.json and the necessary var changes, save this func to notes.\
+            \
+        \}\
+        
+\f2\b catch
+\f3\b0  
+\f2\b let
+\f3\b0  error\{\
+            print(error)\
+        \}\
+        \
+        \
+    \}
+\f0\fs24 \
+\
+Now this function is moved to the taskstore.swift\
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf2 SAVING ON DEVICE 
+\f0\b0\fs24 \
+\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\f2\b\fs22 \cf7 \cb8 class
+\f3\b0 \cf9  \cf10 TaskStore\cf9 : \cf11 ObservableObject\cf9  \{\
+    \cf12 // class that stores and manages my data, this is how the app will interface with my data.\cf9 \
+    \cf12 // store contains an array of prioritized tasks and a helper method to get the index in the PrioritizedTask array that matches with the priority passed to the methods as a parameter\cf9 \
+    \cf11 @Published\cf9  
+\f2\b \cf7 var
+\f3\b0 \cf9  \cf13 prioritizedTasks\cf9  : [\cf14 PrioritizedTasks\cf9 ] = []\
+    \
+    
+\f2\b \cf7 init
+\f3\b0 \cf9 ()\{\
+        \cf15 loadJsonPrioritizedTasks\cf9 ()\
+        \cf12 //Now the data comes from the json(app's bundle)\cf9 \
+    \}\
+  \
+  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 getIndex\cf9 (\cf13 for\cf9  priority: \cf16 Task\cf9 .\cf16 Priority\cf9 ) -> \cf11 Int\cf9  \{\
+    \cf17 prioritizedTasks\cf9 .\cf18 firstIndex\cf9  \{ $0.\cf17 priority\cf9  == priority \}!\
+  \}\
+    
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 loadJsonPrioritizedTasks\cf9 () \{\
+        \cf12 //loadJsonPrioritizedTasks should be called in the intializer for task store\cf9 \
+        \cf12 //get the urls for each json file , for that we use bundles url for resource with extension method\cf9 \
+        \cf12 //Bundle is a representation of the app, it's code and resources,all the files that you pack under xcode project are collectively a part of bundle\cf9 \
+        \cf12 //main represents the current executable in this case your app.\cf9 \
+        \
+        \cf12 //print statement to show your bundle folder\cf9 \
+        \cf18 print\cf9 (\cf19 Bundle\cf9 .\cf20 main\cf9 .\cf20 bundleURL\cf9 )\
+        \cf12 /*\cf9 \
+\cf12          o/p :\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Bundle/Application/614AD0DA-5FEC-4E21-8A1A-6CB37B6C9787/TaskList.app/\cf9 \
+\cf12          \cf9 \
+\cf12          copy "/Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Bundle/Application/614AD0DA-5FEC-4E21-8A1A-6CB37B6C9787/TaskList.app/"\cf9 \
+\cf12          then go to finder and click command + shift + g and go to the bundle folder (finder takes you 1 step before so right click on your app name and click on show package content. [That is the bundle folder, contains all the resources for your app]\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+        \
+        \cf12 // print statemenr for you users document directory url(app specific doc directory)\cf9 \
+        \cf18 print\cf9 (\cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 )\
+        \cf12 /*\cf9 \
+\cf12          o/p :\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/9A70E2FF-23D5-4842-9F18-812F89CCBA42/Documents/\cf9 \
+\cf12          \cf9 \
+\cf12          copy "/Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/9A70E2FF-23D5-4842-9F18-812F89CCBA42/Documents/" and follow the same steps above.\cf9 \
+\cf12          \cf9 \
+\cf12          now this is the app's sandbox document directory(currently empty as we haven't stored anything to read back).\cf9 \
+\cf12          The document directory is outside the app bundle in a seperate location within iOS that keeps your user data on a per app level compartmentalised.\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+        \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  temporaryDirectoryURL = \cf19 FileManager\cf9 .\cf20 default\cf9 .\cf20 temporaryDirectory\cf9 \
+        \cf18 print\cf9 (temporaryDirectoryURL)\
+        \
+        \cf12 /*\cf9 \
+\cf12          o/p:\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/7530C82F-5CEA-47F6-A226-44E0996FF905/tmp/\cf9 \
+\
+\cf12          /tmp/ is a temporary directory if you want to store a temporary data, cache any file, images, etc that you don't need to ensure they are permanently persisted.\cf9 \
+\cf12          storing the encoded tasks in the tmp folder, can cause you loss of data anytime, so the tasks, priorities and statuses need to be stored in a more parmanent data storage i.e the document directory\cf9 \
+\cf12          \cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+\cf12 //        guard let tasksJsonUrl = Bundle.main.url(forResource: "PrioritizedTasks", withExtension: "json")\cf9 \
+\cf12 //        else\{ return \}\cf9 \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  tasksJsonUrl = \cf11 URL\cf9 (\cf18 fileURLWithPath\cf9 : \cf22 "PrioritizedTasks"\cf9 , \cf18 relativeTo\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 ).\cf18 appendingPathExtension\cf9 (\cf22 "json"\cf9 )\
+        \cf12 //FileManager also provides you with a handy method : contentsOfDirectoryAtPath, to acquire a string array of the contents of a particular directory which will be perfect for knowing the files that are available in your different sandbpx directories\cf9 \
+        \cf18 print\cf9 ((
+\f2\b \cf7 try
+\f3\b0 \cf9 ? \cf19 FileManager\cf9 .\cf20 default\cf9 .\cf18 contentsOfDirectory\cf9 (\cf18 atPath\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 .\cf20 path\cf9 )) ?? [])\
+        \cf12 //contentsOfDirectory can return an error so we put try upfront, and also it returns an optional array so we provide a default value\cf9 \
+        \cf12 //O/p : ["PrioritizedTasks.json"]\cf9 \
+        \
+        \cf12 //after fetching the urls, you decode these json using jsonDecoder object(helps to decode json into instances of given data types, here the types are Task and PrioritizedTask.\cf9 \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  decoder = \cf19 JSONDecoder\cf9 ()\
+        \
+        \cf12 //load the contents of the json files as swift data and then decode these data into your types.\cf9 \
+        \cf12 //Data(contentsOf: taskJsonUrl) can throw an error so we wrap it in do try catch block\cf9 \
+        \
+        
+\f2\b \cf7 do
+\f3\b0 \cf9  \{\
+            
+\f2\b \cf7 let
+\f3\b0 \cf9  tasksData = 
+\f2\b \cf7 try
+\f3\b0 \cf9  \cf11 Data\cf9 (\cf18 contentsOf\cf9 : tasksJsonUrl)\
+            \cf17 prioritizedTasks\cf9  = 
+\f2\b \cf7 try
+\f3\b0 \cf9  decoder.\cf18 decode\cf9 ([\cf14 PrioritizedTasks\cf9 ].
+\f2\b \cf7 self
+\f3\b0 \cf9 , \cf18 from\cf9 : tasksData)\
+            print(\cf22 "*******\\n"\cf9 ,\cf17 prioritizedTasks\cf9 )\
+            \cf12 /*\cf9 \
+\cf12              o/p :\cf9 \
+\cf12              *******\cf9 \
+\cf12               [TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.high, tasks: [TaskList.Task(id: F3FD192D-7C51-4E9D-BA1D-A58C586583CE, name: "Code a SwiftUI app", completed: false), TaskList.Task(id: 73E6F987-94FA-49ED-BC8D-A093BB66D78C, name: "Book an escape room", completed: false), TaskList.Task(id: 5D2F7D4A-095F-453F-8BD7-9497D1976DE5, name: "Walk the cat", completed: false), TaskList.Task(id: 6C7B5BA5-DBC6-4876-820F-977B4204855E, name: "Pick up heavy things and put them down", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.medium, tasks: [TaskList.Task(id: 9F215E92-8220-4A19-B596-77A7941F17D2, name: "Make karaoke playlist", completed: false), TaskList.Task(id: 86DFB5DA-674F-43A8-ACB5-4CF093EB0382, name: "Present at iOS meetup group", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.low, tasks: [TaskList.Task(id: A9E200FF-9F8F-4033-BF3C-FDBE2CF91A15, name: "Climb El Capitan", completed: false)]),  TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.no, tasks: [TaskList.Task(id: 686F73F1-965A-49D3-B6D1-7B317F0F7BD7, name: "Learn to make baklava", completed: false), TaskList.Task(id: 2F614F51-7882-4286-842E-4321800BB5D1, name: "Play disc golf in every state", completed: true), TaskList.Task(id: 9BA60D21-714A-46D2-BC83-C823AFC1F9B2, name: "100 movie reboot marathon", completed: false)])]\cf9 \
+\cf12              \cf9 \
+\cf12              Now we are able to load the json data from inside of the document directory into data model, this gets us half the way to loading and decoding your serialized prioritized tasks data. The other half is saving the dsta to your file and persisting that data when you make edits and across app launches.\cf9 \
+\cf12              \cf9 \
+\cf12              */\cf9 \
+        \}\
+        
+\f2\b \cf7 catch
+\f3\b0 \cf9  
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf18 error\cf9 \{\
+            \cf18 print\cf9 (\cf18 error\cf9 )\
+        \}\
+        \
+        \
+    \}\
+\}\
+\
+
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 extension
+\f3\b0 \cf9  \cf10 TaskStore\cf9 .\cf10 PrioritizedTasks\cf9  \{\
+    \cf12 //extensioon of another model, the PrioritizedTasks structure to help with it's initialization\cf9 \
+    \
+  
+\f2\b \cf7 init
+\f3\b0 \cf9 (\cf13 priority\cf9 : \cf16 Task\cf9 .\cf16 Priority\cf9 , \cf13 names\cf9 : [\cf11 String\cf9 ]) \{\
+    
+\f2\b \cf7 self
+\f3\b0 \cf9 .\cf15 init\cf9 (\
+      \cf15 priority\cf9 : priority,\
+      \cf15 tasks\cf9 : names.\cf18 map\cf9  \{ \cf16 Task\cf9 (\cf15 name\cf9 : $0) \}\
+    )\
+  \}\
+\}
+\f0\fs24 \cf2 \cb3 \
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+\cf2 \
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf2 JSON ENCODING 
+\f0\b0\fs24 \
+\
+What to do when your swift objects have date type or data objects in them ?\
+Encodable and decodable can take care of it fro you.\
+Data and Date automatically get serialised to json, because data is an encoded string and date is a floating point, if you want to change any of the encoding strategies for either of them you can use the encoding strategies of JSON Encoder and similarly data decoding and date decoding strategies of JSON Decoder.\
+For Encoding dates : strategies = formatted case that lets you specify a specific date formatter to use. For Data - strategy is to used a basic d4 encoded string.\
+\
+\pard\tx593\pardeftab593\pardirnatural\partightenfactor0
+
+\f2\b \cf7 \cb8 import
+\f3\b0 \cf9  Combine\
+
+\f2\b \cf7 import
+\f3\b0 \cf9  Foundation\
+
+\f2\b \cf7 class
+\f3\b0 \cf9  \cf10 TaskStore\cf9 : \cf11 ObservableObject\cf9  \{\
+    
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf13 prioritizedTasksJsonUrl\cf9  = \cf11 URL\cf9 (\cf18 fileURLWithPath\cf9 : \cf22 "PrioritizedTasks"\cf9 , \cf18 relativeTo\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 ).\cf18 appendingPathExtension\cf9 (\cf22 "json"\cf9 )\
+    \cf12 //getting a url to the file Task.Json and storing it withing the document directory.\cf9 \
+    \
+    \
+    \cf12 // class that stores and manages my data, this is how the app will interface with my data.\cf9 \
+    \cf12 // store contains an array of prioritized tasks and a helper method to get the index in the PrioritizedTask array that matches with the priority passed to the methods as a parameter\cf9 \
+    \cf11 @Published\cf9  
+\f2\b \cf7 var
+\f3\b0 \cf9  \cf13 prioritizedTasks\cf9  : [\cf14 PrioritizedTasks\cf9 ] = []\{\
+        
+\f2\b \cf7 didSet
+\f3\b0 \cf9 \{\
+            \cf15 saveJsonPrioritizedTasks\cf9 ()\
+            \cf12 //be sure to have the document directory open in finder of your app and ensure that it's empty and add a new task in the app.\cf9 \
+        \}\
+    \}\
+    \
+    
+\f2\b \cf7 init
+\f3\b0 \cf9 ()\{\
+        \cf15 loadJsonPrioritizedTasks\cf9 ()\
+        \cf12 //Now the data comes from the json(app's bundle)\cf9 \
+    \}\
+  \
+  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 getIndex\cf9 (\cf13 for\cf9  priority: \cf16 Task\cf9 .\cf16 Priority\cf9 ) -> \cf11 Int\cf9  \{\
+    \cf17 prioritizedTasks\cf9 .\cf18 firstIndex\cf9  \{ $0.\cf17 priority\cf9  == priority \}!\
+  \}\
+    
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 loadJsonPrioritizedTasks\cf9 () \{\
+        \cf12 //loadJsonPrioritizedTasks should be called in the intializer for task store\cf9 \
+        \cf12 //get the urls for each json file , for that we use bundles url for resource with extension method\cf9 \
+        \cf12 //Bundle is a representation of the app, it's code and resources,all the files that you pack under xcode project are collectively a part of bundle\cf9 \
+        \cf12 //main represents the current executable in this case your app.\cf9 \
+        \
+        \cf12 //print statement to show your bundle folder\cf9 \
+        \cf18 print\cf9 (\cf19 Bundle\cf9 .\cf20 main\cf9 .\cf20 bundleURL\cf9 )\
+        \cf12 /*\cf9 \
+\cf12          o/p :\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Bundle/Application/614AD0DA-5FEC-4E21-8A1A-6CB37B6C9787/TaskList.app/\cf9 \
+\cf12          \cf9 \
+\cf12          copy "/Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Bundle/Application/614AD0DA-5FEC-4E21-8A1A-6CB37B6C9787/TaskList.app/"\cf9 \
+\cf12          then go to finder and click command + shift + g and go to the bundle folder (finder takes you 1 step before so right click on your app name and click on show package content. [That is the bundle folder, contains all the resources for your app]\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+        \
+        \cf12 // print statemenr for you users document directory url(app specific doc directory)\cf9 \
+        \cf18 print\cf9 (\cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 )\
+        \cf12 /*\cf9 \
+\cf12          o/p :\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/9A70E2FF-23D5-4842-9F18-812F89CCBA42/Documents/\cf9 \
+\cf12          \cf9 \
+\cf12          copy "/Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/9A70E2FF-23D5-4842-9F18-812F89CCBA42/Documents/" and follow the same steps above.\cf9 \
+\cf12          \cf9 \
+\cf12          now this is the app's sandbox document directory(currently empty as we haven't stored anything to read back).\cf9 \
+\cf12          The document directory is outside the app bundle in a seperate location within iOS that keeps your user data on a per app level compartmentalised.\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+        \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  temporaryDirectoryURL = \cf19 FileManager\cf9 .\cf20 default\cf9 .\cf20 temporaryDirectory\cf9 \
+        \cf18 print\cf9 (temporaryDirectoryURL)\
+        \
+        \cf12 /*\cf9 \
+\cf12          o/p:\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/7530C82F-5CEA-47F6-A226-44E0996FF905/tmp/\cf9 \
+\
+\cf12          /tmp/ is a temporary directory if you want to store a temporary data, cache any file, images, etc that you don't need to ensure they are permanently persisted.\cf9 \
+\cf12          storing the encoded tasks in the tmp folder, can cause you loss of data anytime, so the tasks, priorities and statuses need to be stored in a more parmanent data storage i.e the document directory\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+\cf12 //        guard let tasksJsonUrl = Bundle.main.url(forResource: "PrioritizedTasks", withExtension: "json")\cf9 \
+\cf12 //        else\{ return \}\cf9 \
+        \
+        \cf12 /*\cf9 \
+\cf12          let prioritizedTasksJsonUrl = URL(fileURLWithPath: "PrioritizedTasks", relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("json")\cf9 \
+\cf12          //was here earlier now moved to the top of the class so that now the url is available to use when you save the array of prioritized tasks.\cf9 \
+\cf12          */\cf9 \
+        \
+        \cf12 //FileManager also provides you with a handy method : contentsOfDirectoryAtPath, to acquire a string array of the contents of a particular directory which will be perfect for knowing the files that are available in your different sandbpx directories\cf9 \
+        \cf18 print\cf9 ((
+\f2\b \cf7 try
+\f3\b0 \cf9 ? \cf19 FileManager\cf9 .\cf20 default\cf9 .\cf18 contentsOfDirectory\cf9 (\cf18 atPath\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 .\cf20 path\cf9 )) ?? [])\
+        \cf12 //contentsOfDirectory can return an error so we put try upfront, and also it returns an optional array so we provide a default value\cf9 \
+        \cf12 //O/p : ["PrioritizedTasks.json"]\cf9 \
+        \
+        \cf12 //after fetching the urls, you decode these json using jsonDecoder object(helps to decode json into instances of given data types, here the types are Task and PrioritizedTask.\cf9 \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  decoder = \cf19 JSONDecoder\cf9 ()\
+        \
+        \cf12 //load the contents of the json files as swift data and then decode these data into your types.\cf9 \
+        \cf12 //Data(contentsOf: taskJsonUrl) can throw an error so we wrap it in do try catch block\cf9 \
+        \
+        
+\f2\b \cf7 do
+\f3\b0 \cf9  \{\
+            
+\f2\b \cf7 let
+\f3\b0 \cf9  tasksData = 
+\f2\b \cf7 try
+\f3\b0 \cf9  \cf11 Data\cf9 (\cf18 contentsOf\cf9 : \cf17 prioritizedTasksJsonUrl\cf9 )\
+            \cf17 prioritizedTasks\cf9  = 
+\f2\b \cf7 try
+\f3\b0 \cf9  decoder.\cf18 decode\cf9 ([\cf14 PrioritizedTasks\cf9 ].
+\f2\b \cf7 self
+\f3\b0 \cf9 , \cf18 from\cf9 : tasksData)\
+            print(\cf22 "*******\\n"\cf9 ,\cf17 prioritizedTasks\cf9 )\
+            \cf12 /*\cf9 \
+\cf12              o/p :\cf9 \
+\cf12              *******\cf9 \
+\cf12               [TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.high, tasks: [TaskList.Task(id: F3FD192D-7C51-4E9D-BA1D-A58C586583CE, name: "Code a SwiftUI app", completed: false), TaskList.Task(id: 73E6F987-94FA-49ED-BC8D-A093BB66D78C, name: "Book an escape room", completed: false), TaskList.Task(id: 5D2F7D4A-095F-453F-8BD7-9497D1976DE5, name: "Walk the cat", completed: false), TaskList.Task(id: 6C7B5BA5-DBC6-4876-820F-977B4204855E, name: "Pick up heavy things and put them down", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.medium, tasks: [TaskList.Task(id: 9F215E92-8220-4A19-B596-77A7941F17D2, name: "Make karaoke playlist", completed: false), TaskList.Task(id: 86DFB5DA-674F-43A8-ACB5-4CF093EB0382, name: "Present at iOS meetup group", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.low, tasks: [TaskList.Task(id: A9E200FF-9F8F-4033-BF3C-FDBE2CF91A15, name: "Climb El Capitan", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.no, tasks: [TaskList.Task(id: 686F73F1-965A-49D3-B6D1-7B317F0F7BD7, name: "Learn to make baklava", completed: false), TaskList.Task(id: 2F614F51-7882-4286-842E-4321800BB5D1, name: "Play disc golf in every state", completed: true), TaskList.Task(id: 9BA60D21-714A-46D2-BC83-C823AFC1F9B2, name: "100 movie reboot marathon", completed: false)])]\cf9 \
+\cf12              \cf9 \
+\cf12              Now we are able to load the json data from inside of the document directory into data model, this gets us half the way to loading and decoding your serialized prioritized tasks data. The other half is saving the dsta to your file and persisting that data when you make edits and across app launches.\cf9 \
+\cf12              \cf9 \
+\cf12              */\cf9 \
+        \}\
+        
+\f2\b \cf7 catch
+\f3\b0 \cf9  
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf18 error\cf9 \{\
+            \cf18 print\cf9 (\cf18 error\cf9 )\
+        \}\
+    \}\
+    \
+    
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 saveJsonPrioritizedTasks\cf9 ()\{\
+        \cf12 //Encode your swift type to swift data then acquire your old route url for where to store your data and then save your file with the info to your device storage.\cf9 \
+        \cf12 //Encodable automatically handles writing in to your file in the correct format, so you'll be able to see how the things are stored in the document directory in a plain json file.\cf9 \
+        \cf12 //While loading and using Json Decoder , you have json encoder available to you\cf9 \
+        \cf12 //Add a json encoder at the beginning of the method\cf9 \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  encoder = \cf19 JSONEncoder\cf9 ()\
+        
+\f2\b \cf7 do
+\f3\b0 \cf9  \{\
+            
+\f2\b \cf7 let
+\f3\b0 \cf9  taskData = 
+\f2\b \cf7 try
+\f3\b0 \cf9  encoder.\cf18 encode\cf9 (\cf17 prioritizedTasks\cf9 .\cf18 first\cf9 ?.\cf17 tasks\cf9 .\cf18 last\cf9 )\
+            \cf12 //only parameter it takes is the swift object that conforms to the encodable protocol, when you added the CODABLE protocol informants to a few of your models, you adhered to encodable and decodable.\cf9 \
+            \cf12 //For the object to encode you're just getting a single task out of a prioritized task object in your aaray, as always, start small and expand from there. If writing a single task succeeds, then you can proceed to wite an arraay of prioritized tasks.\cf9 \
+            \cf12 //Encoding can throw an error so try is used.\cf9 \
+        \
+            
+\f2\b \cf7 let
+\f3\b0 \cf9  tasksJsonURL = \cf11 URL\cf9 (\cf18 fileURLWithPath\cf9 : \cf22 "Task"\cf9 , \cf18 relativeTo\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 ).\cf18 appendingPathExtension\cf9 (\cf22 "json"\cf9 )\
+            \cf12 //getting a url to the file Task.Json and storing it withing the document directory.\cf9 \
+            \
+            \cf12 //Final step = write your encoded object in the json file\cf9 \
+            \
+            
+\f2\b \cf7 try
+\f3\b0 \cf9  taskData.\cf18 write\cf9 (\cf18 to\cf9 : tasksJsonURL, \cf18 options\cf9 : .\cf20 atomic\cf9 )\
+            \cf12 //.write can throw an exception and you are asking your encoded file to be written to the data at a specified url.\cf9 \
+            \cf12 //.atomic write = fancy way of saying that data be saved to a separate file first and once that succeeds it gets exchanged for the final file, the one that is specified in url. This ensures that if some crash happens or something goes wrong, the original json file Tasks.Json doesnot get damaged or corrupted.\cf9 \
+            \
+            \
+            \cf12 //where to call this method ? - inside the didSet of the prioritized task property.\cf9 \
+            \cf12 //every time you modify your tasks , it is likely to save your changes to a file, this will make sure that all the changes mad eby the user is imideatly persisted and not lost.\cf9 \
+            \
+        \}\
+        
+\f2\b \cf7 catch
+\f3\b0 \cf9  
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf18 error\cf9 \{\
+            \cf18 print\cf9 (\cf18 error\cf9 )\
+        \}\
+    \}\
+\}\
+\
+
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 extension
+\f3\b0 \cf9  \cf10 TaskStore\cf9 .\cf10 PrioritizedTasks\cf9  \{\
+    \cf12 //extensioon of another model, the PrioritizedTasks structure to help with it's initialization\cf9 \
+    \
+  
+\f2\b \cf7 init
+\f3\b0 \cf9 (\cf13 priority\cf9 : \cf16 Task\cf9 .\cf16 Priority\cf9 , \cf13 names\cf9 : [\cf11 String\cf9 ]) \{\
+    
+\f2\b \cf7 self
+\f3\b0 \cf9 .\cf15 init\cf9 (\
+      \cf15 priority\cf9 : priority,\
+      \cf15 tasks\cf9 : names.\cf18 map\cf9  \{ \cf16 Task\cf9 (\cf15 name\cf9 : $0) \}\
+    )\
+  \}\
+\}\
+
+\f0 \cf2 \cb3 \
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+\cf2  \
+\
+\
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f1\b\fs28 \cf2 Challenge : 
+\f0\b0\fs24 \
+Update the savePrioritizedTasks Method to save your prioritisedTasksArray , also if you can improve the formatting the of the Json file saved.\
+\
+\
+\
+\
+\
+\pard\tx593\pardeftab593\pardirnatural\partightenfactor0
+
+\f2\b \cf7 \cb8 import
+\f3\b0 \cf9  Combine\
+
+\f2\b \cf7 import
+\f3\b0 \cf9  Foundation\
+
+\f2\b \cf7 class
+\f3\b0 \cf9  \cf10 TaskStore\cf9 : \cf11 ObservableObject\cf9  \{\
+    
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf13 tasksJsonURL\cf9  = \cf11 URL\cf9 (\cf18 fileURLWithPath\cf9 : \cf22 "PrioritizedTasks"\cf9 , \cf18 relativeTo\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 ).\cf18 appendingPathExtension\cf9 (\cf22 "json"\cf9 )\
+    \cf12 //getting a url to the file Task.Json and storing it withing the document directory.\cf9 \
+    \
+    \
+    \cf12 // class that stores and manages my data, this is how the app will interface with my data.\cf9 \
+    \cf12 // store contains an array of prioritized tasks and a helper method to get the index in the PrioritizedTask array that matches with the priority passed to the methods as a parameter\cf9 \
+    \cf11 @Published\cf9  
+\f2\b \cf7 var
+\f3\b0 \cf9  \cf13 prioritizedTasks\cf9  : [\cf14 PrioritizedTasks\cf9 ] = []\{\
+        
+\f2\b \cf7 didSet
+\f3\b0 \cf9 \{\
+            \cf15 saveJsonPrioritizedTasks\cf9 ()\
+            \cf12 //be sure to have the document directory open in finder of your app and ensure that it's empty and add a new task in the app.\cf9 \
+        \}\
+    \}\
+    \
+    
+\f2\b \cf7 init
+\f3\b0 \cf9 ()\{\
+        \cf15 loadJsonPrioritizedTasks\cf9 ()\
+        \cf12 //Now the data comes from the json(app's bundle)\cf9 \
+    \}\
+  \
+  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 getIndex\cf9 (\cf13 for\cf9  priority: \cf16 Task\cf9 .\cf16 Priority\cf9 ) -> \cf11 Int\cf9  \{\
+    \cf17 prioritizedTasks\cf9 .\cf18 firstIndex\cf9  \{ $0.\cf17 priority\cf9  == priority \}!\
+  \}\
+    
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 loadJsonPrioritizedTasks\cf9 () \{\
+        \cf12 //loadJsonPrioritizedTasks should be called in the intializer for task store\cf9 \
+        \cf12 //get the urls for each json file , for that we use bundles url for resource with extension method\cf9 \
+        \cf12 //Bundle is a representation of the app, it's code and resources,all the files that you pack under xcode project are collectively a part of bundle\cf9 \
+        \cf12 //main represents the current executable in this case your app.\cf9 \
+        \
+        \cf12 //print statement to show your bundle folder\cf9 \
+        \cf18 print\cf9 (\cf19 Bundle\cf9 .\cf20 main\cf9 .\cf20 bundleURL\cf9 )\
+        \cf12 /*\cf9 \
+\cf12          o/p :\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Bundle/Application/614AD0DA-5FEC-4E21-8A1A-6CB37B6C9787/TaskList.app/\cf9 \
+\cf12          \cf9 \
+\cf12          copy "/Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Bundle/Application/614AD0DA-5FEC-4E21-8A1A-6CB37B6C9787/TaskList.app/"\cf9 \
+\cf12          then go to finder and click command + shift + g and go to the bundle folder (finder takes you 1 step before so right click on your app name and click on show package content. [That is the bundle folder, contains all the resources for your app]\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+        \
+        \cf12 // print statemenr for you users document directory url(app specific doc directory)\cf9 \
+        \cf18 print\cf9 (\cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 )\
+        \cf12 /*\cf9 \
+\cf12          o/p :\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/9A70E2FF-23D5-4842-9F18-812F89CCBA42/Documents/\cf9 \
+\cf12          \cf9 \
+\cf12          copy "/Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/9A70E2FF-23D5-4842-9F18-812F89CCBA42/Documents/" and follow the same steps above.\cf9 \
+\cf12          \cf9 \
+\cf12          now this is the app's sandbox document directory(currently empty as we haven't stored anything to read back).\cf9 \
+\cf12          The document directory is outside the app bundle in a seperate location within iOS that keeps your user data on a per app level compartmentalised.\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+        \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  temporaryDirectoryURL = \cf19 FileManager\cf9 .\cf20 default\cf9 .\cf20 temporaryDirectory\cf9 \
+        \cf18 print\cf9 (temporaryDirectoryURL)\
+        \
+        \cf12 /*\cf9 \
+\cf12          o/p:\cf9 \
+\cf12          \cf21 file:///Users/pritamdash/Library/Developer/CoreSimulator/Devices/7082FBC3-7F5A-429C-BE3C-A8ED02216BF4/data/Containers/Data/Application/7530C82F-5CEA-47F6-A226-44E0996FF905/tmp/\cf9 \
+\
+\cf12          /tmp/ is a temporary directory if you want to store a temporary data, cache any file, images, etc that you don't need to ensure they are permanently persisted.\cf9 \
+\cf12          storing the encoded tasks in the tmp folder, can cause you loss of data anytime, so the tasks, priorities and statuses need to be stored in a more parmanent data storage i.e the document directory\cf9 \
+\cf12          \cf9 \
+\cf12          */\cf9 \
+\cf12 //        guard let tasksJsonUrl = Bundle.main.url(forResource: "PrioritizedTasks", withExtension: "json")\cf9 \
+\cf12 //        else\{ return \}\cf9 \
+        \
+        \cf12 /*\cf9 \
+\cf12          let prioritizedTasksJsonUrl = URL(fileURLWithPath: "PrioritizedTasks", relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("json")\cf9 \
+\cf12          //was here earlier now moved to the top of the class so that now the url is available to use when you save the array of prioritized tasks.\cf9 \
+\cf12          */\cf9 \
+        \
+        \cf12 //FileManager also provides you with a handy method : contentsOfDirectoryAtPath, to acquire a string array of the contents of a particular directory which will be perfect for knowing the files that are available in your different sandbpx directories\cf9 \
+        \cf18 print\cf9 ((
+\f2\b \cf7 try
+\f3\b0 \cf9 ? \cf19 FileManager\cf9 .\cf20 default\cf9 .\cf18 contentsOfDirectory\cf9 (\cf18 atPath\cf9 : \cf19 FileManager\cf9 .\cf17 documentsDirectoryURL\cf9 .\cf20 path\cf9 )) ?? [])\
+        \cf12 //contentsOfDirectory can return an error so we put try upfront, and also it returns an optional array so we provide a default value\cf9 \
+        \cf12 //O/p : ["PrioritizedTasks.json"]\cf9 \
+        \
+        \cf12 //after fetching the urls, you decode these json using jsonDecoder object(helps to decode json into instances of given data types, here the types are Task and PrioritizedTask.\cf9 \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  decoder = \cf19 JSONDecoder\cf9 ()\
+        \
+        \cf12 //load the contents of the json files as swift data and then decode these data into your types.\cf9 \
+        \cf12 //Data(contentsOf: taskJsonUrl) can throw an error so we wrap it in do try catch block\cf9 \
+        \
+        
+\f2\b \cf7 do
+\f3\b0 \cf9  \{\
+            
+\f2\b \cf7 let
+\f3\b0 \cf9  tasksData = 
+\f2\b \cf7 try
+\f3\b0 \cf9  \cf11 Data\cf9 (\cf18 contentsOf\cf9 : \cf17 tasksJsonURL\cf9 )\
+            \cf17 prioritizedTasks\cf9  = 
+\f2\b \cf7 try
+\f3\b0 \cf9  decoder.\cf18 decode\cf9 ([\cf14 PrioritizedTasks\cf9 ].
+\f2\b \cf7 self
+\f3\b0 \cf9 , \cf18 from\cf9 : tasksData)\
+            print(\cf22 "*******\\n"\cf9 ,\cf17 prioritizedTasks\cf9 )\
+            \cf12 /*\cf9 \
+\cf12              o/p :\cf9 \
+\cf12              *******\cf9 \
+\cf12               [TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.high, tasks: [TaskList.Task(id: F3FD192D-7C51-4E9D-BA1D-A58C586583CE, name: "Code a SwiftUI app", completed: false), TaskList.Task(id: 73E6F987-94FA-49ED-BC8D-A093BB66D78C, name: "Book an escape room", completed: false), TaskList.Task(id: 5D2F7D4A-095F-453F-8BD7-9497D1976DE5, name: "Walk the cat", completed: false), TaskList.Task(id: 6C7B5BA5-DBC6-4876-820F-977B4204855E, name: "Pick up heavy things and put them down", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.medium, tasks: [TaskList.Task(id: 9F215E92-8220-4A19-B596-77A7941F17D2, name: "Make karaoke playlist", completed: false), TaskList.Task(id: 86DFB5DA-674F-43A8-ACB5-4CF093EB0382, name: "Present at iOS meetup group", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.low, tasks: [TaskList.Task(id: A9E200FF-9F8F-4033-BF3C-FDBE2CF91A15, name: "Climb El Capitan", completed: false)]), TaskList.TaskStore.PrioritizedTasks(priority: TaskList.Task.Priority.no, tasks: [TaskList.Task(id: 686F73F1-965A-49D3-B6D1-7B317F0F7BD7, name: "Learn to make baklava", completed: false), TaskList.Task(id: 2F614F51-7882-4286-842E-4321800BB5D1, name: "Play disc golf in every state", completed: true), TaskList.Task(id: 9BA60D21-714A-46D2-BC83-C823AFC1F9B2, name: "100 movie reboot marathon", completed: false)])]\cf9 \
+\cf12              \cf9 \
+\cf12              Now we are able to load the json data from inside of the document directory into data model, this gets us half the way to loading and decoding your serialized prioritized tasks data. The other half is saving the dsta to your file and persisting that data when you make edits and across app launches.\cf9 \
+\cf12              \cf9 \
+\cf12              */\cf9 \
+        \}\
+        
+\f2\b \cf7 catch
+\f3\b0 \cf9  
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf18 error\cf9 \{\
+            \cf18 print\cf9 (\cf18 error\cf9 )\
+        \}\
+    \}\
+    \
+    
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 func
+\f3\b0 \cf9  \cf13 saveJsonPrioritizedTasks\cf9 ()\{\
+        \cf12 //Encode your swift type to swift data then acquire your old route url for where to store your data and then save your file with the info to your device storage.\cf9 \
+        \cf12 //Encodable automatically handles writing in to your file in the correct format, so you'll be able to see how the things are stored in the document directory in a plain json file.\cf9 \
+        \cf12 //While loading and using Json Decoder , you have json encoder available to you\cf9 \
+        \cf12 //Add a json encoder at the beginning of the method\cf9 \
+        
+\f2\b \cf7 let
+\f3\b0 \cf9  encoder = \cf19 JSONEncoder\cf9 ()\
+        \cf12 // you can tell this encoder that you want a pretty formatted Json generated not that clammed up version.\cf9 \
+        encoder.\cf20 outputFormatting\cf9  = .\cf20 prettyPrinted\cf9 \
+        
+\f2\b \cf7 do
+\f3\b0 \cf9  \{\
+            
+\f2\b \cf7 let
+\f3\b0 \cf9  tasksData = 
+\f2\b \cf7 try
+\f3\b0 \cf9  encoder.\cf18 encode\cf9 (\cf17 prioritizedTasks\cf9 )\
+            \cf12 //only parameter it takes is the swift object that conforms to the encodable protocol, when you added the CODABLE protocol informants to a few of your models, you adhered to encodable and decodable.\cf9 \
+            \cf12 //For the object to encode you're just getting a single task out of a prioritized task object in your aaray, as always, start small and expand from there. If writing a single task succeeds, then you can proceed to wite an arraay of prioritized tasks.\cf9 \
+            \cf12 //Encoding can throw an error so try is used.\cf9 \
+            \
+            \cf12 //Final step = write your encoded object in the json file\cf9 \
+            \
+            
+\f2\b \cf7 try
+\f3\b0 \cf9  tasksData.\cf18 write\cf9 (\cf18 to\cf9 : \cf17 tasksJsonURL\cf9 , \cf18 options\cf9 : .\cf20 atomic\cf9 )\
+            \cf12 //.write can throw an exception and you are asking your encoded file to be written to the data at a specified url.\cf9 \
+            \cf12 //.atomic write = fancy way of saying that data be saved to a separate file first and once that succeeds it gets exchanged for the final file, the one that is specified in url. This ensures that if some crash happens or something goes wrong, the original json file Tasks.Json doesnot get damaged or corrupted.\cf9 \
+            \
+            \
+            \cf12 //where to call this method ? - inside the didSet of the prioritized task property.\cf9 \
+            \cf12 //every time you modify your tasks , it is likely to save your changes to a file, this will make sure that all the changes mad eby the user is imideatly persisted and not lost.\cf9 \
+            \
+        \}\
+        
+\f2\b \cf7 catch
+\f3\b0 \cf9  
+\f2\b \cf7 let
+\f3\b0 \cf9  \cf18 error\cf9 \{\
+            \cf18 print\cf9 (\cf18 error\cf9 )\
+        \}\
+    \}\
+\}\
+\
+
+\f2\b \cf7 private
+\f3\b0 \cf9  
+\f2\b \cf7 extension
+\f3\b0 \cf9  \cf10 TaskStore\cf9 .\cf10 PrioritizedTasks\cf9  \{\
+    \cf12 //extensioon of another model, the PrioritizedTasks structure to help with it's initialization\cf9 \
+    \
+  
+\f2\b \cf7 init
+\f3\b0 \cf9 (\cf13 priority\cf9 : \cf16 Task\cf9 .\cf16 Priority\cf9 , \cf13 names\cf9 : [\cf11 String\cf9 ]) \{\
+    
+\f2\b \cf7 self
+\f3\b0 \cf9 .\cf15 init\cf9 (\
+      \cf15 priority\cf9 : priority,\
+      \cf15 tasks\cf9 : names.\cf18 map\cf9  \{ \cf16 Task\cf9 (\cf15 name\cf9 : $0) \}\
+    )\
+  \}\
+\}\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f0 \cf2 \cb3 \
+\
+\
+\
+\pard\tx494\pardeftab494\pardirnatural\partightenfactor0
+
+\f1\b\fs36 \cf2 CODABLE HEIRARCHY
+\f0\b0\fs24  \
+\
+\
+\
+\
+\
+\
+\
+}
